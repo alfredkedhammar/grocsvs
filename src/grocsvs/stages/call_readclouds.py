@@ -61,7 +61,8 @@ class CombineReadcloudsStep(step.StepChunk):
         for i, inpath in enumerate(self.get_input_paths()):
             self.logger.log("Index: {}\t Path: {}".format(i,inpath))
             try:
-                readclouds.append(pandas.read_table(inpath, compression="gzip"))
+                # FutureWarning: read_table is deprecated, use read_csv instead, passing sep='\t'
+                readclouds.append(pandas.read_csv(inpath, compression="gzip", sep='\t'))
             except pandas.io.common.EmptyDataError:
                 self.logger.log("No read clouds found in {}; skipping".format(inpath))
 
@@ -485,7 +486,8 @@ def load_fragments(options, sample, dataset, chrom=None, start=None, end=None, u
         usecols.append("num_reads")
         
     s = StringIO.StringIO("\n".join(tabix.fetch(chrom, start, end)))
-    readclouds = pandas.read_table(s, header=None, names=Readcloud._fields, usecols=usecols)
+    # FutureWarning: read_table is deprecated, use read_csv instead, passing sep='\t'
+    readclouds = pandas.read_csv(s, header=None, names=Readcloud._fields, usecols=usecols, sep='\t')
     readclouds["chrom"] = readclouds["chrom"].astype("string")
     
     if min_reads_per_frag > 0:
