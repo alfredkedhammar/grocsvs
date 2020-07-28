@@ -59,7 +59,7 @@ class CombineReadcloudsStep(step.StepChunk):
 
         readclouds = []
         for i, inpath in enumerate(self.get_input_paths()):
-            self.logger.log("\t"+str(i)+","+inpath)
+            self.logger.log("Index: {}\t Path: {}".format(i,inpath))
             try:
                 readclouds.append(pandas.read_table(inpath, compression="gzip"))
             except pandas.io.common.EmptyDataError:
@@ -165,8 +165,8 @@ class EstimateReadCloudParamsStep(step.StepChunk):
         result["read_cloud_clustering_distance"] = \
             max(10000, int(numpy.ceil(numpy.percentile(inter_read_distances, 99) / 5000)) * 5000)
 
-        self.logger.log("{} {} {}".format(*numpy.percentile(inter_read_distances, [50, 99, 99.9])))
-        self.logger.log(result["read_cloud_clustering_distance"])
+        self.logger.log("Percentiles of inter read distances 50:{}, 99:{} 99.9:{}".format(*numpy.percentile(inter_read_distances, [50, 99, 99.9])))
+        self.logger.log(result["Determined read clustering distance: {}".format(read_cloud_clustering_distance)])
                         
         with open(outpaths["inter_read_distances"], "w") as outf:
             utilities.pickle.dump(result, outf, protocol=-1)
