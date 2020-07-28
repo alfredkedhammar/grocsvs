@@ -81,7 +81,7 @@ class CombineReadcloudsStep(step.StepChunk):
             isinbcs[bs:be] = readclouds["bc"][bs:be].isin(goodbcs)
             bs+=bcwin
         
-#        readclouds = readclouds.loc[readclouds["bc"].isin(goodbcs)]
+        #readclouds = readclouds.loc[readclouds["bc"].isin(goodbcs)]
         readclouds = readclouds.loc[isinbcs]
 
         good_barcodes = readclouds["bc"].unique()
@@ -171,7 +171,7 @@ class EstimateReadCloudParamsStep(step.StepChunk):
         with open(outpaths["inter_read_distances"], "w") as outf:
             utilities.pickle.dump(result, outf, protocol=-1)
             
-def sample_inter_read_distances(bam_path, window_size=0.5e6, skip_size=5e7):
+def sample_inter_read_distances(bam_path, window_size=0.5e6, skip_size=5e7):    
     bam = pysam.AlignmentFile(bam_path)
 
     window_size = int(window_size)
@@ -180,29 +180,38 @@ def sample_inter_read_distances(bam_path, window_size=0.5e6, skip_size=5e7):
         skip_size = window_size
         
     distances = []
-    
+
+    print "Will look at {} references".format(len(bam.references))
+
     for chrom, length in zip(bam.references, bam.lengths):
-        if length < 2*skip_size+2*window_size: continue
-            
-        print chrom
+        print "Looking at {} with length {}".format(chrom, length)
+        if length < 2*skip_size+2*window_size: 
+            print "Chromosome too short, continuing"
+            continue
+        print "Chromosome length is sufficient"
+        print "Starting to sample distance between barcodes"
+        
         for start in range(skip_size, length-skip_size, skip_size):
             bc_last_pos = {}
-
             for read in bam.fetch(chrom, start, start+window_size):
+                
                 if read.is_secondary or read.is_supplementary or read.is_unmapped or read.is_read2:
                     continue
                 if not read.has_tag("BX"):
                     continue
+                
                 bc = read.get_tag("BX")
                 if bc in bc_last_pos:
                     d = read.pos - bc_last_pos[bc]
                     if d < 60000:
                         distances.append(d)
                         if len(distances) > 10e6: # that's a plenty big sample!
+                            print "Obtained more than 10 million barcode distances > 60k bp. No more sampling needed."
                             return distances
                 bc_last_pos[bc] = read.pos
 
     if len(distances) < 25 and skip_size > window_size:
+        print "Got very few barcode distances. Rerunning with 1 percent skip_size"
         new_skip_size = skip_size / 100
         return sample_inter_read_distances(bam_path, window_size, new_skip_size)
     
@@ -276,12 +285,11 @@ def call_readclouds(bam_path, chrom, max_dist):
     readcloud_iter = detector.get_read_clouds(chrom)
     dataframe = pandas.DataFrame(readcloud_iter)
 
+    print "Length of readcloud dataframe is {}".format(len(dataframe))
     if len(dataframe) > 1:
         dataframe = dataframe.sort_values(["start_pos", "end_pos"])
 
     return dataframe
-
-
 
 
 def is_good_read(read):
@@ -297,7 +305,9 @@ def is_good_read(read):
 
 
 class ReadcloudDetector(object):
-    def __init__(self, bam_path, max_dist, min_end_mapq=30, require_one_mapq=60):
+    # The initial quality thresholds are 30 and 60 for BWA with max mapq 60
+    # We use bowtie2 with max mapq 42 so we set the threshholds to 21 and 42 respectively.
+    def __init__(self, bam_path, max_dist, min_end_mapq=21, require_one_mapq=42):
         self.bam = pysam.AlignmentFile(bam_path)
         self.max_dist = max_dist
         self.min_end_mapq = min_end_mapq
@@ -317,6 +327,8 @@ class ReadcloudDetector(object):
 
         self.cur_start = 0
         _progress = int(1e6)
+
+        # Start walking along chromosome read by read
         for i, read in enumerate(self.bam.fetch(chrom)):
             if i % _progress == 0:
                 print "{:>15} {:15,.0f}".format(i, read.pos)
@@ -324,14 +336,20 @@ class ReadcloudDetector(object):
             # if i > 2e6:
             #     break
 
+            # If the pos. of new read is distant, move our curr.pos. there and
+            # call clouds for all passed barcodes which haven't been recently encountered
             if (read.pos - self.cur_start) > self.max_dist:
                 self.cur_start = read.pos
+                
                 for read_cloud in self._flush():
                     yield read_cloud
+            
+            # Look at the current read and act accordingly
             read_cloud = self._add_read(read)
-            if read_cloud is not None:
+            if read_cloud:
                 yield read_cloud
 
+        # Process remainder
         for read_cloud in self._flush():
             yield read_cloud
 
@@ -367,8 +385,10 @@ class ReadcloudDetector(object):
         return read_cloud
 
     def _flush(self):
-        to_flush = set(self._barcodes_to_reads) - self._recently_observed_bcs
+        # This function breaks recorded barcodes which have NOT been recently observed into read clouds
 
+        to_flush = set(self._barcodes_to_reads) - self._recently_observed_bcs
+        
         for bc in to_flush:
             read_cloud = self._make_read_cloud(bc)
 
@@ -378,6 +398,8 @@ class ReadcloudDetector(object):
                 yield read_cloud
 
         self._recently_observed_bcs = set()
+        # ... and then wipes the record of which barcodes have been recently observed
+        # The barcodes which were spared are no longer protected
 
     def _add_read(self, read):
         if not is_good_read(read):
@@ -389,17 +411,22 @@ class ReadcloudDetector(object):
         #     print read.pos, read.mapq, len(self._barcodes_to_reads.get(bc, []))
             
         if bc in self._barcodes_to_reads:
+            # If the barcode is known since previously...
             previous_read = self._barcodes_to_reads[bc][-1]
             if (read.pos - previous_read.aend) > self.max_dist:
+                # If the previous linked reads are too far back, break them into a cloud
                 read_cloud = self._make_read_cloud(bc)
+                # ... then start a new cloud on the new read
                 self._barcodes_to_reads[bc] = [read]
                 self._barcodes_to_haplotypes[bc] = get_read_haplotype(read)
                 self._recently_observed_bcs.add(bc)
                 return read_cloud
             else:
+                # If the linked reads are close, simply record the new read
                 self._barcodes_to_reads[bc].append(read)
                 self._recently_observed_bcs.add(bc)
         elif read.mapq > self.min_end_mapq:
+            # If the barcode is novel and quality is ok, start a new cloud *
             self._barcodes_to_reads[bc] = [read]
             self._recently_observed_bcs.add(bc)
             self._barcodes_to_haplotypes[bc] = get_read_haplotype(read)

@@ -11,6 +11,7 @@ dependencies:
   - htslib
   - bwa
   - graphviz
+  - rpy2=*=py27*
   - h5py>=2.6.0=py27*
   - ipython-cluster-helper>=0.5.4=py27*
   - networkx>=2.0=py27*
