@@ -166,7 +166,7 @@ class EstimateReadCloudParamsStep(step.StepChunk):
             max(10000, int(numpy.ceil(numpy.percentile(inter_read_distances, 99) / 5000)) * 5000)
 
         self.logger.log("Percentiles of inter read distances 50:{}, 99:{} 99.9:{}".format(*numpy.percentile(inter_read_distances, [50, 99, 99.9])))
-        self.logger.log(result["Determined read clustering distance: {}".format(read_cloud_clustering_distance)])
+        self.logger.log("Determined read clustering distance: {}".format(result["read_cloud_clustering_distance"]))
                         
         with open(outpaths["inter_read_distances"], "w") as outf:
             utilities.pickle.dump(result, outf, protocol=-1)
