@@ -71,14 +71,15 @@ def get_stages():
     stages["Preflight"] = svstages.preflight.PreflightStep
 
     stages["Constants"] = svstages.constants.ConstantsStep
+
     stages["Estimate Read Cloud Parameters"] = svstages.call_readclouds.EstimateReadCloudParamsStep
     stages["Call Read Clouds"] = svstages.call_readclouds.CallReadcloudsStep
     stages["Combine Read Clouds"] = svstages.call_readclouds.CombineReadcloudsStep
 
     # stages["Filter Fragments"] = svstages.filter_fragments.FilterFragmentsStep
     stages["Sample Info"] = svstages.sample_info.SampleInfoStep
-    stages["QC"] = svstages.qc.QCStep
 
+    stages["QC"] = svstages.qc.QCStep
 
     # Find SV candidates
 

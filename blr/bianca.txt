@@ -1,0 +1,1 @@
+To install grocsvs on Bianca, first remove all requirements from setup.py.

@@ -1,5 +1,5 @@
-# Whenever this file is updated, you need to run misc/condalock.sh to create
-# the environment.lock.yml file.
+# This file can be used to create a conda environment for BLR-compatible grocsvs
+# The packages, versions and builds are based on the requirements listed in README.rst and requirements.txt
 
 channels:
   - conda-forge
