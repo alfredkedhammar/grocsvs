@@ -57,7 +57,7 @@ class PostAssemblyMergeStep(step.StepChunk):
         refine_breakpoints_events["orientationx"] = refine_breakpoints_events["orientation"].str[0]
         refine_breakpoints_events["orientationy"] = refine_breakpoints_events["orientation"].str[1]
 
-        events = pandas.concat([assembled_events, refine_breakpoints_events, sort=True])
+        events = pandas.concat([assembled_events, refine_breakpoints_events], sort=True)
 
         return events
 
