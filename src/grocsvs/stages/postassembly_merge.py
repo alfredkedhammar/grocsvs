@@ -43,13 +43,13 @@ class PostAssemblyMergeStep(step.StepChunk):
     def load_events(self):
         walk_assemblies_step = walk_assemblies.WalkAssembliesStep(self.options)
         assembled_events_path = walk_assemblies_step.outpaths(final=True)["walk_assemblies"]
-        assembled_events = pandas.read_table(assembled_events_path)
+        assembled_events = pandas.read_csv(assembled_events_path, sep="\t")
         assembled_events["assembled"] = True
 
         refine_breakpoints_step = refine_grid_search_breakpoints.CombineRefinedBreakpointsStep(
             self.options)
         refine_breakpoints_path = refine_breakpoints_step.outpaths(final=True)["refined_pairs"]
-        refine_breakpoints_events = pandas.read_table(refine_breakpoints_path)
+        refine_breakpoints_events = pandas.read_csv(refine_breakpoints_path, sep="\t")
         refine_breakpoints_events["assembled"] = False
         refine_breakpoints_events["x"] = refine_breakpoints_events["new_x"]
         refine_breakpoints_events["y"] = refine_breakpoints_events["new_y"]
@@ -57,7 +57,7 @@ class PostAssemblyMergeStep(step.StepChunk):
         refine_breakpoints_events["orientationx"] = refine_breakpoints_events["orientation"].str[0]
         refine_breakpoints_events["orientationy"] = refine_breakpoints_events["orientation"].str[1]
 
-        events = pandas.concat([assembled_events, refine_breakpoints_events])
+        events = pandas.concat([assembled_events, refine_breakpoints_events, sort=True])
 
         return events
 

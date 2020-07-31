@@ -278,7 +278,7 @@ class PostprocessingStep(step.StepChunk):
         summary = pandas.Series(summary)
 
         outpath = self.outpaths(final=False)["summary"]
-        summary.to_csv(outpath, sep="\t")
+        summary.to_csv(outpath, sep="\t", header=False)
             
         print summary
 
@@ -359,7 +359,7 @@ class PostprocessingStep(step.StepChunk):
         input_step = genotyping.MergeGenotypesStep(self.options)
         inpath = input_step.outpaths(final=True)["genotypes"]
 
-        results = pandas.read_table(inpath)
+        results = pandas.read_csv(inpath, sep="\t")
 
         min_fraction = 0.10
         max_p = 1e-6

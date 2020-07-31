@@ -17,7 +17,7 @@ class AssemblyStep(step.StepChunk):
     @staticmethod
     def get_steps(options):
         edges_path = cluster_svs.ClusterSVsStep(options).outpaths(final=True)["edges"]
-        graphs_table = pandas.read_table(edges_path)
+        graphs_table = pandas.read_csv(edges_path, sep="\t")
         graphs_table["chromx"] = graphs_table["chromx"].astype("string")
         graphs_table["chromy"] = graphs_table["chromy"].astype("string")
 

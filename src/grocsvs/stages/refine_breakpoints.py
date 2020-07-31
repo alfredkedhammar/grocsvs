@@ -60,7 +60,7 @@ class RefineBreakpointsWithAssembliesStep(step.StepChunk):
         for input_step in input_steps:
             if input_step.chunk == self.chunk:
                 inpath = input_step.outpaths(final=True)["evidence"]
-                significant_events.append(pandas.read_table(inpath))
+                significant_events.append(pandas.read_csv(inpath, sep="\t"))
 
         print significant_events
         significant_events = pandas.concat(significant_events)
@@ -74,7 +74,7 @@ class RefineBreakpointsWithAssembliesStep(step.StepChunk):
 
         assemblies_path = walk_assemblies.WalkAssembliesStep(self.options) \
                               .outpaths(final=True)["walk_assemblies"]
-        assembly_evidence = pandas.read_table(assemblies_path)
+        assembly_evidence = pandas.read_csv(assemblies_path, sep="\t")
         assembly_evidence["chromx"] = assembly_evidence["chromx"].astype("string")
         assembly_evidence["chromy"] = assembly_evidence["chromy"].astype("string")
 

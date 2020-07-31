@@ -88,7 +88,7 @@ def load_evidence(options):
     for input_step in input_steps:
         path = input_step.outpaths(final=True)["refined_pairs"]
         try:
-            evidence = pandas.read_table(path)
+            evidence = pandas.read_csv(path, sep="\t")
             if len(evidence) > 0:
                 evidences.append(evidence)
         except ValueError:
@@ -110,7 +110,7 @@ def load_evidence(options):
 def load_assembly_evidence(options):
     path = walk_assemblies.WalkAssembliesStep(options) \
                           .outpaths(final=True)["walk_assemblies"]
-    evidence = pandas.read_table(path)
+    evidence = pandas.read_csv(path, sep="\t")
     evidence["chromx"] = evidence["chromx"].astype("string")
     evidence["chromy"] = evidence["chromy"].astype("string")
     return evidence

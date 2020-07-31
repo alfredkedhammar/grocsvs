@@ -55,7 +55,7 @@ class WalkAssembliesStep(step.StepChunk):
     def run(self):
         edges_path = cluster_svs.ClusterSVsStep(self.options).outpaths(final=True)["edges"]
 
-        clusters = pandas.read_table(edges_path)
+        clusters = pandas.read_csv(edges_path, sep="\t")
         clusters["chromx"] = clusters["chromx"].astype("string")
         clusters["chromy"] = clusters["chromy"].astype("string")
 

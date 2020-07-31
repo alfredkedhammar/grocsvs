@@ -92,7 +92,7 @@ def load_evidence(options):
     mate_pair_support = []
     path = refine_grid_search_breakpoints.CombineRefinedBreakpointsStep(options)\
                              .outpaths(final=True)["refined_pairs"]
-    evidence = pandas.read_table(path)
+    evidence = pandas.read_csv(path, sep="\t")
 
     evidence["chromx"] = evidence["chromx"].astype("string")
     evidence["chromy"] = evidence["chromy"].astype("string")

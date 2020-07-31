@@ -84,6 +84,7 @@ def get_stages():
     # Find SV candidates
 
     stages["Window Barcodes"] = svstages.window_barcodes.WindowBarcodesStep
+    
     stages["Barcode Overlaps"] = svstages.barcode_overlaps.BarcodeOverlapsStep
 
     stages["SV Candidate Regions"] = \

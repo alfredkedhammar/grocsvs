@@ -85,7 +85,7 @@ class SupportingBarcodesStep(step.StepChunk):
         path = postassembly_merge.PostAssemblyMergeStep(self.options) \
                                  .outpaths(final=True)["merged_candidates"]
 
-        events = pandas.read_table(path)
+        events = pandas.read_csv(path, sep="\t")
         events["chrom"] = events["chrom"].astype("string")
         return events
         

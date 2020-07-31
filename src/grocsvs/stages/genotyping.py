@@ -44,7 +44,7 @@ class MergeGenotypesStep(step.StepChunk):
 
         for chunk in range(nchunks(events)):
             inpath = GenotypingStep(self.options, chunk).outpaths(final=True)["genotypes"]
-            genotypes.append(pandas.read_table(inpath))
+            genotypes.append(pandas.read_csv(inpath,sep="\t"))
 
         genotypes = pandas.concat(genotypes, ignore_index=True)
         genotypes["chromx"] = genotypes["chromx"].astype("string")
@@ -129,7 +129,7 @@ class GenotypingStep(step.StepChunk):
 def load_events(options, chunk=None):
     final_clustering_step = final_clustering.FinalClusterSVsStep(options)
     clustered_events_path = final_clustering_step.outpaths(final=True)["edges"]
-    clustered_events = pandas.read_table(clustered_events_path)
+    clustered_events = pandas.read_csv(clustered_events_path, sep="\t")
     clustered_events["chromx"] = clustered_events["chromx"].astype("string")
     clustered_events["chromy"] = clustered_events["chromy"].astype("string")
 

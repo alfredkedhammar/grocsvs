@@ -46,7 +46,7 @@ class CombineRefinedBreakpointsStep(step.StepChunk):
             inpath = input_step.outpaths(final=True)["refined_pairs"]
 
             try:
-                inputs.append(pandas.read_table(inpath))
+                inputs.append(pandas.read_csv(inpath, sep="\t"))
             except pandas.io.common.EmptyDataError:
                 pass
         if len(inputs) == 0:
@@ -120,7 +120,7 @@ class RefineGridSearchBreakpointsStep(step.StepChunk):
             input_step = sv_candidates.SVCandidatesStep(self.options, sample, dataset, self.chromx, self.chromy)
             inpath = input_step.outpaths(final=True)["svs"]
             try:
-                sample_events = pandas.read_table(inpath)
+                sample_events = pandas.read_csv(inpath, sep="\t")
                 if len(sample_events) > 0:
                     cur_events.append(sample_events)
             except pandas.io.common.EmptyDataError:
