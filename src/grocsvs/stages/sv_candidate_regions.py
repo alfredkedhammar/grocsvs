@@ -11,7 +11,7 @@ from grocsvs import structuralvariants
 
 from grocsvs.stages import barcode_overlaps
 
-
+import pdb
 
 class SVCandidateRegionsStep(step.StepChunk):
     """
@@ -187,6 +187,9 @@ def get_sv_regions(hist, p, chrom1, chrom2, offdiag_dist, clustering_dist,
 	# TODO: FutureWarning: Using a non-tuple sequence for multidimensional indexing is deprecated; 
 	#  use `arr[tuple(seq)]` instead of `arr[seq]`. In the future this will be interpreted as 
 	#  an array index, `arr[np.array(seq)]`, which will result either in an error or a different result.
+
+        pdb.set_trace()
+
         best_position = numpy.where(p[region_positions] == p[region_positions].min())[0][0]
         
 	bestp = p[region_positions,best_position]

@@ -11,6 +11,7 @@ from grocsvs import structuralvariants
 
 from grocsvs.stages import sv_candidates
 
+import pdb
 
 class CombineRefinedBreakpointsStep(step.StepChunk):
     @staticmethod
@@ -283,6 +284,9 @@ def get_breakpoint(frags, pos, orientation, extend=20000):
         
     diff = density[peak] - density
     dist = numpy.sqrt(numpy.abs(numpy.arange(len(density))-peak))
+
+    pdb.set_trace()
+
     score = numpy.ma.masked_array(diff / dist.astype(float), mask=False)
     score.mask[numpy.isnan(score)] = True
     

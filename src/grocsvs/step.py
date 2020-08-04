@@ -66,13 +66,13 @@ class StepChunk(object):
 
     def start_logging(self):
         self.logger = log.Logger(self.log_path)
-        self.logger.log("-- starting logging {} --".format(str(self)))
+        #self.logger.log("-- starting logging {} --".format(str(self)))
         self._start_time = time.time()
 
     def stop_logging(self):
         elapsed = time.time() - self._start_time
-        self.logger.log("-> finished running step; time elapsed: {}".format(datetime.timedelta(seconds=elapsed)))
-        self.logger.log("-- stopping logging --")
+        #self.logger.log("-> finished running step; time elapsed: {}".format(datetime.timedelta(seconds=elapsed)))
+        #self.logger.log("-- stopping logging --")
         
 
     @classmethod

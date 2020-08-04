@@ -11,7 +11,7 @@ from grocsvs import utilities
 from grocsvs.stages import call_readclouds
 from grocsvs.stages import sv_candidate_regions
 
-
+import pdb
 
 class SVCandidatesStep(step.StepChunk):
     """
@@ -313,6 +313,8 @@ def get_svs(mat, bg_mat, sv_region, window_size, rolling=0):
         weights = numpy.ones((rolling*2+1, rolling*2+1))    
         mat = ndimage.convolve(mat, weights, mode="constant")
         bg_mat = ndimage.convolve(bg_mat, weights, mode="constant")
+
+    pdb.set_trace()
 
     norm = mat/bg_mat
     norm[numpy.isnan(norm)] = 0

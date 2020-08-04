@@ -12,6 +12,8 @@ from grocsvs import utilities
 from grocsvs.stages import collect_reads_for_barcodes
 from grocsvs.stages import cluster_svs
 
+import pdb
+
 
 class AssemblyStep(step.StepChunk):
     @staticmethod
@@ -106,6 +108,9 @@ class AssemblyStep(step.StepChunk):
                     
         for id_ in reads_to_ids:
             if len(reads_to_ids[id_]) != 2:
+
+                pdb.set_trace()
+
                 self.logger.log("Pair error: {}".format(reads_to_ids[id_]))
                     
                 
